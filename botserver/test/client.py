@@ -1,5 +1,5 @@
 import requests
-from server.src.app import MESSAGE_URI
+from botserver.src.app import MESSAGE_URI
 
 BASE_URL = "http://localhost:5000"
 MASSAGE_URL = BASE_URL + MESSAGE_URI

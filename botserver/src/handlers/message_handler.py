@@ -2,7 +2,7 @@ import json
 import logging
 import tornado.gen
 import tornado.web
-from server.src.handlers.main_handler import MainHandler
+from botserver.src.handlers.main_handler import MainHandler
 
 
 class MessageHandler(MainHandler):
@@ -19,7 +19,7 @@ class MessageHandler(MainHandler):
                 # TODO this is a temporary response, should be meaninful.
                 r = "Any random response"
             except Exception:
-                r = "Internal server error"
+                r = "Internal botserver error"
                 self.logger.exception(r)
                 self.write(json.dumps(r, ensure_ascii=False))
                 self.finish()

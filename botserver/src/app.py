@@ -2,7 +2,7 @@ import logging
 import tornado.gen
 import tornado.httpclient
 import tornado.web
-from server.src.handlers.message_handler import MessageHandler
+from botserver.src.handlers.message_handler import MessageHandler
 
 BASE_URI = '/deeppavlov/pilot/api/v1.0'
 MESSAGE_URI = "{}/message".format(BASE_URI)
@@ -20,7 +20,7 @@ class Server_API(object):
         ], debug=True)
 
     def start(self, port):
-        logger.info('Start server')
+        logger.info('Start botserver')
         app = self.make_app()
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()
