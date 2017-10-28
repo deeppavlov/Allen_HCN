@@ -29,10 +29,10 @@ class BabiDatasetReader(DatasetReader):
     """
 
     def __init__(self, entity_tracker, action_tracker,
-                 source_token_indexers: Dict[str, TokenIndexer] = None):
+                 token_indexers: Dict[str, TokenIndexer] = None):
         self._action_templates = SequenceField(action_tracker.get_action_templates())
         self._et = entity_tracker
-        self._source_token_indexers = source_token_indexers or {"tokens": SingleIdTokenIndexer()}
+        self._token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
         self.dialog_indices = None
 
     @overrides
@@ -62,7 +62,7 @@ class BabiDatasetReader(DatasetReader):
 
     def text_to_instance(self, user_utterance: str, response_template: int = -1) -> Instance:
         tokenized_source = user_utterance.split(' ')
-        source_field = TextField(tokenized_source, self._source_token_indexers)
+        source_field = TextField(tokenized_source, self._token_indexers)
         if response_template != -1:
             target_field = IndexField(response_template, self._action_templates)
             return Instance({"source_tokens": source_field, "target_template_number": target_field})
@@ -77,13 +77,13 @@ class BabiDatasetReader(DatasetReader):
         entity_tracker = params.pop('entity_tracker', None)
         action_tracker = params.pop('action_tracker', None)
 
-        source_indexers_type = params.pop('source_token_indexers', None)
-        if source_indexers_type is None:
-            source_token_indexers = None
+        token_indexers_type = params.pop('source_token_indexers', None)
+        if token_indexers_type is None:
+            token_indexers = None
         else:
-            source_token_indexers = TokenIndexer.dict_from_params(source_indexers_type)
+            token_indexers = TokenIndexer.dict_from_params(token_indexers_type)
         params.assert_empty(cls.__name__)
-        return BabiDatasetReader(entity_tracker, action_tracker, source_token_indexers)
+        return BabiDatasetReader(entity_tracker, action_tracker, token_indexers)
 
     def get_template_id(self, response):
 
