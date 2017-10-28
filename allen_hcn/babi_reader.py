@@ -85,7 +85,6 @@ class BabiDatasetReader(DatasetReader):
         params.assert_empty(cls.__name__)
         return BabiDatasetReader(entity_tracker, action_tracker, source_token_indexers)
 
-    ################################################################3
     def get_template_id(self, response):
 
         def extract_(response):
