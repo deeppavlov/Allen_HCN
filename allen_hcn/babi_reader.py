@@ -77,7 +77,7 @@ class BabiDatasetReader(DatasetReader):
         entity_tracker = params.pop('entity_tracker', None)
         action_tracker = params.pop('action_tracker', None)
 
-        token_indexers_type = params.pop('source_token_indexers', None)
+        token_indexers_type = params.pop('token_indexers', None)
         if token_indexers_type is None:
             token_indexers = None
         else:
