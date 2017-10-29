@@ -6,9 +6,15 @@
       "tokens": {
         "type": "single_id",
         "lowercase_tokens": true
-        }
       }
     },
+    "action_tracker": {
+      "type": "hcn_at"
+    },
+    "entity_tracker": {
+      "type": "hcn_et"
+    }
+  },
   "validation_data_path": "",
   "model": {
     "type": "hcn",

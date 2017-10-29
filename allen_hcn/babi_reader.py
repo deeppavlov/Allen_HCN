@@ -10,6 +10,8 @@ from allennlp.data.token_indexers import TokenIndexer, SingleIdTokenIndexer
 from allennlp.common.checks import ConfigurationError
 from allennlp.common import Params
 
+from allen_hcn.actions import HCNActionTracker
+from allen_hcn.entities import HCNEntityTracker
 import allen_hcn.util as util
 
 logger = logging.getLogger(__name__)
@@ -28,7 +30,7 @@ class BabiDatasetReader(DatasetReader):
         target_tokens: ``TextField``
     """
 
-    def __init__(self, entity_tracker, action_tracker,
+    def __init__(self, entity_tracker: HCNEntityTracker, action_tracker: HCNActionTracker,
                  token_indexers: Dict[str, TokenIndexer] = None):
         self._action_templates = SequenceField(action_tracker.get_action_templates())
         self._et = entity_tracker
@@ -74,8 +76,18 @@ class BabiDatasetReader(DatasetReader):
         """
         Constructs the dataset reader described by ``params``.
         """
-        entity_tracker = params.pop('entity_tracker', None)
-        action_tracker = params.pop('action_tracker', None)
+        action_tracker_type = params.pop('action_tracker', None)
+        entity_tracker_type = params.pop('entity_tracker', None)
+
+        if entity_tracker_type is None:
+            entity_tracker = None
+        else:
+            entity_tracker = HCNEntityTracker()
+
+        if action_tracker_type is None:
+            action_tracker = None
+        else:
+            action_tracker = HCNActionTracker(entity_tracker)
 
         token_indexers_type = params.pop('token_indexers', None)
         if token_indexers_type is None:
