@@ -46,9 +46,9 @@ class ActionTracker(Registrable):
 
         return construct_mask(ctxt_f)
 
-    def get_action_templates(self):
+    def get_action_templates(self, file_path):
         responses = list(set([self.et.extract_entities(response, update=False)
-                              for response in util.get_responses()]))
+                              for response in util.get_responses(file_path)]))
 
         def extract_(response):
             template = []
@@ -78,11 +78,11 @@ class ActionTracker(Registrable):
 
 @ActionTracker.register("hcn_at")
 class HCNActionTracker(ActionTracker):
-    def __init__(self, ent_tracker):
+    def __init__(self, ent_tracker, file_path):
         # maintain an instance of EntityTracker
         self.et = ent_tracker
         # get a list of action templates
-        self.action_templates = self.get_action_templates()
+        self.action_templates = self.get_action_templates(file_path)
         self.action_size = len(self.action_templates)
         # action mask
         self.am = np.zeros([self.action_size], dtype=np.float32)
