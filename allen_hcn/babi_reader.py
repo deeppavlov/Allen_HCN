@@ -48,9 +48,9 @@ class BabiDatasetReader(DatasetReader):
         self.dialog_indices = dialog_indices
 
         # get utterances
-        utterances = util.get_utterances(dialogs)
+        utterances = util.get_utterances(file_path, dialogs)
         # get responses
-        responses = util.get_responses(dialogs)
+        responses = util.get_responses(file_path, dialogs)
         responses = [self.get_template_id(response) for response in responses]
 
         instances = []
