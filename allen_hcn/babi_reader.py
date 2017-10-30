@@ -44,7 +44,7 @@ class BabiDatasetReader(DatasetReader):
         et = HCNEntityTracker()
         at = HCNActionTracker(et, file_path)
 
-        action_templates = at.action_templates()
+        action_templates = at.action_templates
 
         # get dialogs from file
         logger.info("Reading instances from lines in file at: {}".format(file_path))
@@ -59,14 +59,14 @@ class BabiDatasetReader(DatasetReader):
 
         instances = []
         for u, r in zip(utterances, responses):
-            instances.append(self.text_to_instance(u, r, action_templates))
+            instances.append(self.text_to_instance(action_templates, u, r))
 
         if not instances:
             raise ConfigurationError("No instances read!")
 
         return Dataset(instances)
 
-    def text_to_instance(self, action_templates, user_utterance: str,
+    def text_to_instance(self, action_templates: list, user_utterance: str,
                          response_template: int = -1) -> Instance:
         tokenized_source = user_utterance.split(' ')
         source_field = TextField(tokenized_source, self._token_indexers)
