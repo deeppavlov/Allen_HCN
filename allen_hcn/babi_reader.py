@@ -1,11 +1,12 @@
 import logging
 from overrides import overrides
 from typing import Dict
+import json
 
 from allennlp.data.dataset import Dataset
 from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 from allennlp.data.instance import Instance
-from allennlp.data.fields import TextField, IndexField, SequenceField
+from allennlp.data.fields import TextField, IndexField, ListField
 from allennlp.data.token_indexers import TokenIndexer, SingleIdTokenIndexer
 from allennlp.common.checks import ConfigurationError
 from allennlp.common import Params
@@ -33,7 +34,6 @@ class BabiDatasetReader(DatasetReader):
     def __init__(self,
                  token_indexers: Dict[str, TokenIndexer] = None):
         self._token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
-        self.dialog_indices = None
 
     @overrides
     def read(self, file_path) -> Dataset:
@@ -49,7 +49,8 @@ class BabiDatasetReader(DatasetReader):
         # get dialogs from file
         logger.info("Reading instances from lines in file at: {}".format(file_path))
         dialogs, dialog_indices = util.read_dialogs(file_path, with_indices=True)
-        self.dialog_indices = dialog_indices
+        with open('out/dialog_indices.json', 'w') as f:
+            json.dump(dialog_indices, f)
 
         # get utterances
         utterances = util.get_utterances(file_path, dialogs)
@@ -71,7 +72,7 @@ class BabiDatasetReader(DatasetReader):
         tokenized_source = user_utterance.split(' ')
         source_field = TextField(tokenized_source, self._token_indexers)
         if response_template != -1:
-            target_field = IndexField(response_template, action_templates)
+            target_field = IndexField(response_template, ListField(action_templates))
             return Instance({"source_tokens": source_field, "target_template_number": target_field})
         else:
             return Instance({'source_tokens': source_field})
