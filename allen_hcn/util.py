@@ -1,8 +1,8 @@
-def read_content():
-    return ' '.join(get_utterances())
+def read_content(file_path):
+    return ' '.join(get_utterances(file_path))
+
 
 def read_dialogs(file_path, with_indices=False):
-
     def rm_index(row):
         return [' '.join(row[0].split(' ')[1:])] + row[1:]
 
@@ -14,7 +14,7 @@ def read_dialogs(file_path, with_indices=False):
         return filtered_
 
     with open(file_path) as f:
-        dialogs = filter_([ rm_index(row.split('\t')) for row in  f.read().split('\n') ])
+        dialogs = filter_([rm_index(row.split('\t')) for row in f.read().split('\n')])
         # organize dialogs -> dialog_indices
         prev_idx = -1
         n = 1
@@ -23,10 +23,10 @@ def read_dialogs(file_path, with_indices=False):
         for i, dialog in enumerate(dialogs):
             if not dialogs[i][0]:
                 dialog_indices.append({
-                    'start' : prev_idx + 1,
-                    'end' : i - n + 1
+                    'start': prev_idx + 1,
+                    'end': i - n + 1
                 })
-                prev_idx = i-n
+                prev_idx = i - n
                 n += 1
             else:
                 updated_dialogs.append(dialog)
@@ -39,17 +39,17 @@ def read_dialogs(file_path, with_indices=False):
 
 def get_utterances(file_path, dialogs=[]):
     dialogs = dialogs if len(dialogs) else read_dialogs(file_path)
-    return [ row[0] for row in dialogs ]
+    return [row[0] for row in dialogs]
+
 
 def get_responses(file_path, dialogs=[]):
     dialogs = dialogs if len(dialogs) else read_dialogs(file_path)
-    return [ row[1] for row in dialogs ]
+    return [row[1] for row in dialogs]
 
 
 def get_entities():
-
     def filter_(items):
-        return sorted(list(set([ item for item in items if item and '_' not in item ])))
+        return sorted(list(set([item for item in items if item and '_' not in item])))
 
     with open('data/dialog-babi-kb-all.txt') as f:
-        return filter_([item.split('\t')[-1] for item in f.read().split('\n') ])
+        return filter_([item.split('\t')[-1] for item in f.read().split('\n')])
