@@ -109,4 +109,5 @@ ENV/
 # This project
 ser/*
 out/*
+allen_hcn/test.py
 
