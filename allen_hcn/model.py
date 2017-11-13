@@ -70,6 +70,10 @@ class HybridCodeLSTM(Model):
             # reshape LSTM's state tuple (2,128) -> (1,256)
             state_reshaped = torch.cat((state[0], state[1]), 1)
 
+            # output projection
+            w_out = torch.nn.init.xavier_uniform(torch.zeros(2 * self.nb_hidden, self.action_size))
+            b_out = torch.nn.init.constant(torch.zeros(1, self.action_size), val=0.)
+
 
         return sum(output_dict['loss'])/len(output_dict)
 
