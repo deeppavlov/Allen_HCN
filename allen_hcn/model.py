@@ -77,6 +77,14 @@ class HybridCodeLSTM(Model):
             # get logits
             logits = torch.matmul(state_reshaped, w_out) + b_out
 
+            # probabilities
+            #  normalization : elemwise multiply with action mask
+            smax = torch.nn.Softmax()
+            tensor_action_mask = torch.from_numpy(self.at.action_mask()).float()
+            squeezed = torch.squeeze(smax(logits))
+            probs = torch.mul(squeezed.data, tensor_action_mask)
+            print(probs)
+
 
         return sum(output_dict['loss'])/len(output_dict)
 
