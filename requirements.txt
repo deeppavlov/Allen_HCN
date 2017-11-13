@@ -1,4 +1,4 @@
-numpy==1.11.3
+numpy==1.13.3
 pytorch==0.2.0
 overrides==1.9
 tornado==4.5.2
