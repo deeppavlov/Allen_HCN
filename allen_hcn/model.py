@@ -33,9 +33,9 @@ class HybridCodeLSTM(Model):
         self.action_size = self.at.action_size
         self.obs_size = self.emb.dim + self.bow_enc.vocab_size + self.et.num_features
         self.nb_hidden = nb_hidden
-        self.init_state_c = Variable(torch.zeros(1, 1, self.nb_hidden))  # TODO Why do I have to add a dim??
-        self.init_state_h = Variable(torch.zeros(1, 1, self.nb_hidden))
-        self.net = torch.nn.LSTM(input_size=self.nb_hidden, hidden_size=self.nb_hidden)
+        self.init_state_c = Variable(torch.zeros(1, self.nb_hidden))  # TODO Why do I have to add a dim??
+        self.init_state_h = Variable(torch.zeros(1, self.nb_hidden))
+        self.net = torch.nn.LSTMCell(input_size=self.nb_hidden, hidden_size=self.nb_hidden)
         self._loss = torch.nn.CrossEntropyLoss()
         initializer(self)
 
@@ -64,15 +64,18 @@ class HybridCodeLSTM(Model):
             projected_inputs = torch.matmul(inputs, w_init) + b_init
 
             # get hn and state
-            lstm_op, state = self.net(Variable(projected_inputs), (self.init_state_h,
-                                                                   self.init_state_c))
+            hn, cn = self.net(Variable(projected_inputs), (self.init_state_h,
+                                                           self.init_state_c))
 
             # reshape LSTM's state tuple (2,128) -> (1,256)
-            state_reshaped = torch.cat((state[0], state[1]), 1)
+            state_reshaped = torch.cat((hn, cn), 1).data
 
             # output projection
             w_out = torch.nn.init.xavier_uniform(torch.zeros(2 * self.nb_hidden, self.action_size))
             b_out = torch.nn.init.constant(torch.zeros(1, self.action_size), val=0.)
+
+            # get logits
+            logits = torch.matmul(state_reshaped, w_out) + b_out
 
 
         return sum(output_dict['loss'])/len(output_dict)
