@@ -46,20 +46,26 @@ class HybridCodeLSTM(Model):
                 source_tokens: Dict[str, Callable[[Variable], torch.LongTensor]],
                 target_template_number=None) -> Dict[str, torch.FloatTensor]:
         token_indices = source_tokens['tokens']
+        output_dict = {'loss': []}
+        count_instances = 0
         for indices in token_indices:
             utt = ' '.join([self.vocab._index_to_token['tokens'][t_idx] for t_idx in indices.data if
                             t_idx != 0])
-            # TODO why u_ent unused in the original repo?
-            u_ent = self.et.extract_entities(utt)
+            u_ent = self.et.extract_entities(utt)  # TODO why u_ent unused in the original repo?
             u_ent_features = self.et.context_features()
             u_emb = self.emb.encode(utt)
             u_bow = self.bow_enc.encode(utt)
+
             # concat features
             features = np.array([np.concatenate((u_ent_features, u_emb, u_bow), axis=0)])
-            inputs = Variable(torch.from_numpy(features).float())
-            output, hn = self.net(inputs, (self.init_state_h, self.init_state_c))
+            inputs = torch.from_numpy(features).float()
 
-        return {'loss': output}
+            # input projection
+            w_init = torch.nn.init.xavier_uniform(torch.zeros(self.obs_size, self.nb_hidden))
+            b_init = torch.nn.init.constant(torch.zeros(1, self.nb_hidden), val=0.)
+            projected_features = torch.matmul(inputs, w_init) + b_init
+
+        return sum(output_dict['loss'])/len(output_dict)
 
     @overrides
     def forward_on_instance(self, instance: Instance):
