@@ -51,7 +51,7 @@ class HybridCodeLSTM(Model):
         for indices, target_number in zip(token_indices, target_template_number):
             utt = ' '.join([self.vocab._index_to_token['tokens'][t_idx] for t_idx in indices.data if
                             t_idx != 0])
-            u_ent = self.et.extract_entities(utt)  # TODO why u_ent unused in the original repo?
+            u_ent = self.et.extract_entities(utt)
             u_ent_features = self.et.context_features()
             u_emb = self.emb.encode(utt)
             u_bow = self.bow_enc.encode(utt)
