@@ -46,7 +46,9 @@ class HybridCodeLSTM(Model):
         token_indices = source_tokens['tokens']
         output_dict = {'loss': []}
         count_instances = 0
-        for indices in token_indices:
+
+        # Count loss on a single Instance (utterance-response pair)
+        for indices, target_number in zip(token_indices, target_template_number):
             utt = ' '.join([self.vocab._index_to_token['tokens'][t_idx] for t_idx in indices.data if
                             t_idx != 0])
             u_ent = self.et.extract_entities(utt)  # TODO why u_ent unused in the original repo?
@@ -83,8 +85,9 @@ class HybridCodeLSTM(Model):
             tensor_action_mask = torch.from_numpy(self.at.action_mask()).float()
             squeezed = torch.squeeze(smax(logits))
             probs = torch.mul(squeezed.data, tensor_action_mask)
-            print(probs)
 
+            # loss
+            loss = self._loss(logits, target_number)
 
         return sum(output_dict['loss'])/len(output_dict)
 
