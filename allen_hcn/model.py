@@ -42,10 +42,10 @@ class HybridCodeLSTM(Model):
     @overrides
     def forward(self,
                 source_tokens: Dict[str, Callable[[Variable], torch.LongTensor]],
-                target_template_number=None) -> Dict[str, torch.FloatTensor]:
+                target_template_number=None) -> Dict[str, Variable]:
         token_indices = source_tokens['tokens']
-        output_dict = {'loss': []}
-        count_instances = 0
+        output_dict = {'loss': 0}
+        losses = []
 
         # Count loss on a single Instance (utterance-response pair)
         for indices, target_number in zip(token_indices, target_template_number):
@@ -88,8 +88,12 @@ class HybridCodeLSTM(Model):
 
             # loss
             loss = self._loss(logits, target_number)
+            losses.append(loss)
 
-        return sum(output_dict['loss'])/len(output_dict)
+        output_dict['loss'] = Variable((sum(losses) / len(losses)).data, requires_grad=True)
+        self.reset_parameters()  # TODO check that values should be reset here!
+
+        return output_dict
 
     @overrides
     def forward_on_instance(self, instance: Instance):
@@ -113,6 +117,6 @@ class HybridCodeLSTM(Model):
         return cls(vocab=vocab,
                    nb_hidden=nb_hidden)
 
-        # def reset_parameters(self):
-        #     self.init_state_c = zeros(1, self.hidden_dim)
-        #     self.init_state_h = zeros(1, self.hidden_dim)
+    def reset_parameters(self):
+        self.init_state_c = Variable(torch.zeros(1, self.nb_hidden))
+        self.init_state_h = Variable(torch.zeros(1, self.nb_hidden))
