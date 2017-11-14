@@ -33,7 +33,7 @@ class HybridCodeLSTM(Model):
         self.action_size = self.at.action_size
         self.obs_size = self.emb.dim + self.bow_enc.vocab_size + self.et.num_features
         self.nb_hidden = nb_hidden
-        self.init_state_c = Variable(torch.zeros(1, self.nb_hidden))  # TODO Why do I have to add a dim??
+        self.init_state_c = Variable(torch.zeros(1, self.nb_hidden))
         self.init_state_h = Variable(torch.zeros(1, self.nb_hidden))
         self.net = torch.nn.LSTMCell(input_size=self.nb_hidden, hidden_size=self.nb_hidden)
         self._loss = torch.nn.CrossEntropyLoss()
