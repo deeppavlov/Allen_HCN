@@ -5,7 +5,6 @@ import torch
 from torch.autograd import Variable
 
 from allennlp.models import Model
-from allennlp.data.instance import Instance
 from allennlp.data import Vocabulary
 from allennlp.common.params import Params
 from allennlp.nn import InitializerApplicator
@@ -94,22 +93,6 @@ class HybridCodeLSTM(Model):
         self.reset_parameters()  # TODO check that values should be reset here!
 
         return output_dict
-
-    @overrides
-    def forward_on_instance(self, instance: Instance):
-        features = None
-        action = None
-        action_mask = None
-        model_input = {
-            self.features_: features.reshape([1, self.obs_size]),
-            self.action_: [action],
-            self.init_state_c_: self.init_state_c,
-            self.init_state_h_: self.init_state_h,
-            self.action_mask_: action_mask
-        }
-
-        output, _ = self.nn(model_input, (self.init_state_c, self.init_state_h))
-        return output
 
     @classmethod
     def from_params(cls, vocab: Vocabulary, params: Params) -> 'HybridCodeLSTM':
